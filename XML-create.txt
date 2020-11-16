@@ -1,0 +1,61 @@
+// @see https://docs.oracle.com/cd/E13222_01/wls/docs100/xml/stax.html
+// @see http://technojeeves.com/index.php/54-serialize-a-java-collection-with-the-streaming-api
+// write using the Streaming API for XML (StAX)
+void exportXML(String fileName) {
+    try (BufferedWriter file = new BufferedWriter(
+            new OutputStreamWriter(
+                    new FileOutputStream(fileName), "UTF8"))) {
+        XMLStreamWriter xsw = XMLOutputFactory
+                .newInstance()
+                .createXMLStreamWriter(file);
+
+        // write the default XML declaration
+        xsw.writeStartDocument("utf-8", "1.0");
+        xsw.writeCharacters("\n");
+
+        // write a comment
+        xsw.writeComment("This is a phone book");
+        xsw.writeCharacters("\n");
+
+        // write the root element "phones"
+        xsw.writeStartElement("phones");
+        xsw.writeCharacters("\n");
+
+        // write all records as list of entry
+        for (Map.Entry<String, String> e : pb.entrySet()) {
+            xsw.writeCharacters("\t");
+            xsw.writeStartElement("phone");
+            xsw.writeAttribute("name", e.getValue());
+            //xsw.writeAttribute("key", e.getKey());
+            xsw.writeCharacters(e.getKey());
+            xsw.writeEndElement();
+            xsw.writeCharacters("\n");
+        }
+        xsw.writeEndElement();
+        xsw.writeCharacters("\n");
+        xsw.writeEndDocument();
+        xsw.close();
+    } catch (XMLStreamException | IOException ex) {
+        System.out.println(ex.getMessage());
+    }
+}
+
+// write to XML manually
+void exportXMLManually(String fileName) {
+    try (BufferedWriter file = new BufferedWriter(
+            new OutputStreamWriter(
+                    new FileOutputStream(fileName), "UTF8"))) {
+
+        // write the default XML declaration, comment and root element
+        file.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+        file.write("<!--This is a phone book-->\n");
+        file.write("<phones>\n");
+        // write all records as list of entry
+        for (Map.Entry<String, String> e : pb.entrySet())
+            file.write("\t<phone name=\"" + e.getValue() + "\">" +
+                    e.getKey() + "</phone>\n");
+        file.write("</phones>\n");
+    } catch (IOException ex) {
+        System.out.println(ex.getMessage());
+    }
+}
